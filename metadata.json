@@ -1,0 +1,7 @@
+{
+  "name": "Gramin Jan Jagaran Kendra - Nepali NGO Portal",
+  "description": "A dedicated platform for Gramin Jan Jagaran Kendra, a Nepali NGO empowering rural communities through health, IT training, and social awareness.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
