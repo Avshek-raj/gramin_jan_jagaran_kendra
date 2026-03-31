@@ -7,10 +7,10 @@ interface LandingPageProps {
   setView: (view: ViewState) => void;
   programs: Program[];
   stats: Stat[];
-  onAddComment?: (programId: string, comment: Comment) => void;
+
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ setView, programs, stats, onAddComment }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ setView, programs, stats }) => {
   const activePrograms = programs.filter(p => p.status === 'active').slice(0, 3);
   const completedPrograms = programs.filter(p => p.status === 'completed').slice(0, 2);
 
@@ -88,7 +88,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs, stats, onA
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {activePrograms.map((program) => (
-              <ProgramCard key={program.id} program={program} onClick={() => setView('donate')} onAddComment={onAddComment} />
+              <ProgramCard key={program.id} program={program} onClick={() => setView('donate')} />
             ))}
           </div>
         </div>
@@ -106,7 +106,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs, stats, onA
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {completedPrograms.map((program) => (
-              <ProgramCard key={program.id} program={program} onClick={() => {}} onAddComment={onAddComment} />
+              <ProgramCard key={program.id} program={program} onClick={() => {}} />
             ))}
           </div>
         </div>

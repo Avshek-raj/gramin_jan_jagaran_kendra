@@ -45,4 +45,4 @@ export interface Stat {
   icon: string;
 }
 
-export type ViewState = 'home' | 'programs' | 'members' | 'donate' | 'admin' | 'contact';
+export type ViewState = 'home' | 'programs' | 'members' | 'donate' | 'admin' | 'contact' | 'login';

@@ -5,17 +5,17 @@ import { ViewState } from '../types';
 interface NavbarProps {
   currentView: ViewState;
   setView: (view: ViewState) => void;
-  isAdminLoggedIn?: boolean;
-  onAdminLogout?: () => void;
+  isUserLoggedIn?: boolean;
+  onUserLogout?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isAdminLoggedIn, onAdminLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isUserLoggedIn, onUserLogout }) => {
   const navItems: { label: string; value: ViewState; icon: string }[] = [
     { label: 'Home', value: 'home', icon: 'fa-home' },
     { label: 'Our Work', value: 'programs', icon: 'fa-layer-group' },
     { label: 'Team', value: 'members', icon: 'fa-users' },
     { label: 'Contact', value: 'contact', icon: 'fa-envelope' },
-    ...(isAdminLoggedIn ? [{ label: 'Admin', value: 'admin' as ViewState, icon: 'fa-user-lock' }] : []),
+    ...(isUserLoggedIn ? [{ label: 'Admin', value: 'admin' as ViewState, icon: 'fa-user-lock' }] : []),
   ];
 
   return (
@@ -62,9 +62,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isAdminLoggedIn, 
               <i className="fas fa-heart text-xs"></i>
               <span>Support Now</span>
             </button>
-            {isAdminLoggedIn && (
+            {!isUserLoggedIn ? (
               <button
-                onClick={onAdminLogout}
+                onClick={() => setView('login')}
+                className="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
+              >
+                <i className="fas fa-user-lock"></i>
+                <span>Admin</span>
+              </button>
+            ) : (
+              <button
+                onClick={onUserLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
               >
                 <i className="fas fa-sign-out-alt"></i>

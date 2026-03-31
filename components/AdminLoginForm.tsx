@@ -43,9 +43,9 @@ const AdminLoginForm: React.FC<AdminLoginFormProps> = ({ onLogin }) => {
       >
         Login
       </button>
-      <p className="text-xs text-slate-400 text-center italic">
+      {/* <p className="text-xs text-slate-400 text-center italic">
         Hint: Use password "admin123" for demo purposes
-      </p>
+      </p> */}
     </form>
   );
 };

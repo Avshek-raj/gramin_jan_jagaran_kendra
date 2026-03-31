@@ -14,8 +14,8 @@ import AdminLoginForm from './components/AdminLoginForm';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>('home');
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
-    const saved = localStorage.getItem('ngo_admin_logged_in');
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(() => {
+    const saved = localStorage.getItem('ngo_user_logged_in');
     return saved === 'true';
   });
   const [programs, setPrograms] = useState<Program[]>(() => {
@@ -72,47 +72,49 @@ const App: React.FC = () => {
     ));
   };
 
-  const handleAdminLogin = (password: string): boolean => {
+  const handleUserLogin = (password: string): boolean => {
     if (password === 'admin123') {
-      setIsAdminLoggedIn(true);
-      localStorage.setItem('ngo_admin_logged_in', 'true');
+      setIsUserLoggedIn(true);
+      localStorage.setItem('ngo_user_logged_in', 'true');
+      setView('home');
       return true;
     }
     return false;
   };
 
-  const handleAdminLogout = () => {
-    setIsAdminLoggedIn(false);
-    localStorage.removeItem('ngo_admin_logged_in');
+  const handleUserLogout = () => {
+    setIsUserLoggedIn(false);
+    localStorage.removeItem('ngo_user_logged_in');
     setView('home');
   };
 
-  const handleAddComment = (programId: string, comment: any) => {
-    setPrograms(prev => prev.map(p => 
-      p.id === programId 
-        ? { ...p, comments: [...(p.comments || []), comment] }
-        : p
-    ));
-  };
+
 
   const renderContent = () => {
     switch (view) {
       case 'home':
-        return <LandingPage setView={setView} programs={programs} stats={stats} onAddComment={handleAddComment} />;
+        return <LandingPage setView={setView} programs={programs} stats={stats} />;
       case 'programs':
-        return <ProgramsPage programs={programs} onDonate={(p) => setView('donate')} onAddComment={handleAddComment} />;
+        return <ProgramsPage programs={programs} onDonate={(p) => setView('donate')} />;
       case 'members':
         return <MembersPage members={members} />;
       case 'contact':
         return <ContactPage />;
       case 'donate':
         return <DonationFlow programs={programs.filter(p => p.status === 'active')} onComplete={handleDonation} />;
+      case 'login':
+        return (
+          <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-3xl shadow-lg border border-slate-100">
+            <h2 className="text-2xl font-black text-slate-900 mb-6">Login to Your Account</h2>
+            <AdminLoginForm onLogin={handleUserLogin} />
+          </div>
+        );
       case 'admin':
-        if (!isAdminLoggedIn) {
+        if (!isUserLoggedIn) {
           return (
             <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-3xl shadow-lg border border-slate-100">
-              <h2 className="text-2xl font-black text-slate-900 mb-6">Admin Login</h2>
-              <AdminLoginForm onLogin={handleAdminLogin} />
+              <h2 className="text-2xl font-black text-slate-900 mb-6">Admin Access</h2>
+              <AdminLoginForm onLogin={handleUserLogin} />
             </div>
           );
         }
@@ -128,7 +130,7 @@ const App: React.FC = () => {
             onUpdateStats={setStats}
             onDeleteProgram={(id) => setPrograms(prev => prev.filter(p => p.id !== id))}
             onDeleteMember={(id) => setMembers(prev => prev.filter(m => m.id !== id))}
-            onLogout={handleAdminLogout}
+            onLogout={handleUserLogout}
           />
         );
       default:
@@ -138,7 +140,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Navbar currentView={view} setView={setView} isAdminLoggedIn={isAdminLoggedIn} onAdminLogout={handleAdminLogout} />
+      <Navbar currentView={view} setView={setView} isUserLoggedIn={isUserLoggedIn} onUserLogout={handleUserLogout} />
       <main className="flex-grow pt-20">
         {renderContent()}
       </main>

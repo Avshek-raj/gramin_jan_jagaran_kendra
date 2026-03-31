@@ -1,18 +1,14 @@
 
 import React, { useState } from 'react';
-import { Program, Comment } from '../types';
+import { Program } from '../types';
 
 interface ProgramCardProps {
   program: Program;
   onClick: () => void;
-  onAddComment?: (programId: string, comment: Comment) => void;
 }
 
-const ProgramCard: React.FC<ProgramCardProps> = ({ program, onClick, onAddComment }) => {
+const ProgramCard: React.FC<ProgramCardProps> = ({ program, onClick }) => {
   const [showStory, setShowStory] = useState(false);
-  const [showComments, setShowComments] = useState(false);
-  const [commentName, setCommentName] = useState('');
-  const [commentText, setCommentText] = useState('');
   const isCompleted = program.status === 'completed';
   const progress = Math.min((program.currentAmount / program.goalAmount) * 100, 100);
 
@@ -21,21 +17,6 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, onClick, onAddCommen
       setShowStory(true);
     } else {
       onClick();
-    }
-  };
-
-  const handleAddComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (commentName && commentText && onAddComment) {
-      const newComment: Comment = {
-        id: Date.now().toString(),
-        author: commentName,
-        text: commentText,
-        date: new Date().toISOString(),
-      };
-      onAddComment(program.id, newComment);
-      setCommentName('');
-      setCommentText('');
     }
   };
 
@@ -114,60 +95,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, onClick, onAddCommen
             <i className={`fas ${isCompleted ? 'fa-arrow-right' : 'fa-heart'} text-xs`}></i>
           </button>
 
-          {onAddComment && (
-            <button 
-              onClick={() => setShowComments(!showComments)}
-              className="w-full mt-3 py-2 border-2 border-slate-100 hover:border-emerald-300 text-slate-600 hover:text-emerald-600 rounded-xl font-bold text-sm transition-all flex items-center justify-center space-x-2"
-            >
-              <i className="fas fa-comments"></i>
-              <span>Comments ({program.comments?.length || 0})</span>
-            </button>
-          )}
         </div>
-
-        {showComments && onAddComment && (
-          <div className="px-8 pb-8 border-t border-slate-100">
-            <div className="mt-6 space-y-4">
-              {program.comments && program.comments.length > 0 && (
-                <div className="max-h-48 overflow-y-auto space-y-3 mb-4 p-4 bg-slate-50 rounded-xl">
-                  {program.comments.map((comment) => (
-                    <div key={comment.id} className="text-sm">
-                      <div className="font-bold text-slate-900">{comment.author}</div>
-                      <p className="text-slate-600 text-xs mt-1">{comment.text}</p>
-                      <div className="text-xs text-slate-400 mt-1">
-                        {new Date(comment.date).toLocaleDateString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <form onSubmit={handleAddComment} className="space-y-3">
-                <input
-                  type="text"
-                  value={commentName}
-                  onChange={(e) => setCommentName(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-emerald-500 focus:outline-none"
-                  required
-                />
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-emerald-500 focus:outline-none resize-none h-20"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors"
-                >
-                  Post Comment
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Success Story Modal */}
