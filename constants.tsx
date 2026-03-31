@@ -1,6 +1,15 @@
 
 import { Program, Member } from './types';
 
+import { Stat } from './types';
+
+export const INITIAL_STATS: Stat[] = [
+  { label: 'Provinces Served', val: '7/7', icon: 'fa-map-signs' },
+  { label: 'Rural Beneficiaries', val: '120k+', icon: 'fa-users' },
+  { label: 'IT Trainees', val: '800+', icon: 'fa-graduation-cap' },
+  { label: 'Partner Organizations', val: '45+', icon: 'fa-handshake' },
+];
+
 export const INITIAL_PROGRAMS: Program[] = [
   {
     id: 'p1',

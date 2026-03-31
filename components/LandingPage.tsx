@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { Program, ViewState } from '../types';
+import { Program, ViewState, Stat, Comment } from '../types';
 import ProgramCard from './ProgramCard';
 
 interface LandingPageProps {
   setView: (view: ViewState) => void;
   programs: Program[];
+  stats: Stat[];
+  onAddComment?: (programId: string, comment: Comment) => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ setView, programs }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ setView, programs, stats, onAddComment }) => {
   const activePrograms = programs.filter(p => p.status === 'active').slice(0, 3);
   const completedPrograms = programs.filter(p => p.status === 'completed').slice(0, 2);
 
@@ -63,11 +65,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs }) => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
             {[
-              { title: 'Digital Literacy', desc: 'Establishing modern IT centers to give Nepali youth a global edge.', icon: 'fa-laptop-code', color: 'bg-blue-50 text-blue-600' },
-              { title: 'Rural Health', desc: 'Mobile camps and maternal care in the hills and Terai regions.', icon: 'fa-heartbeat', color: 'bg-rose-50 text-rose-600' },
-              { title: 'Social Awareness', desc: 'Rights education and empowerment programs for marginalized groups.', icon: 'fa-bullhorn', color: 'bg-emerald-50 text-emerald-600' },
+              { title: 'Digital Literacy', desc: 'Establishing modern IT training and awareness programs to give Nepali youth a global edge.', icon: 'fa-laptop-code', color: 'bg-emerald-50 text-emerald-600', cardBg: 'bg-emerald-50' },
+              { title: 'Rural Health', desc: 'Mobile camps and maternal care in the hills and Terai regions.', icon: 'fa-heartbeat', color: 'bg-rose-50 text-rose-600', cardBg: 'bg-rose-50' },
+              { title: 'Social Awareness', desc: 'Rights education and empowerment programs for marginalized groups.', icon: 'fa-bullhorn', color: 'bg-teal-50 text-teal-600', cardBg: 'bg-teal-50' },
             ].map((item, i) => (
-              <div key={i} className="p-8 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all hover:shadow-xl group">
+              <div key={i} className={`p-8 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all hover:shadow-xl group ${item.cardBg}`}>
                 <div className={`w-14 h-14 ${item.color} rounded-2xl flex items-center justify-center mb-6 text-xl group-hover:scale-110 transition-transform`}>
                   <i className={`fas ${item.icon}`}></i>
                 </div>
@@ -86,7 +88,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs }) => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {activePrograms.map((program) => (
-              <ProgramCard key={program.id} program={program} onClick={() => setView('donate')} />
+              <ProgramCard key={program.id} program={program} onClick={() => setView('donate')} onAddComment={onAddComment} />
             ))}
           </div>
         </div>
@@ -104,7 +106,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {completedPrograms.map((program) => (
-              <ProgramCard key={program.id} program={program} onClick={() => {}} />
+              <ProgramCard key={program.id} program={program} onClick={() => {}} onAddComment={onAddComment} />
             ))}
           </div>
         </div>
@@ -114,12 +116,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ setView, programs }) => {
       <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-            {[
-              { label: 'Provinces Served', val: '7/7', icon: 'fa-map-signs' },
-              { label: 'Rural Beneficiaries', val: '120k+', icon: 'fa-users' },
-              { label: 'IT Trainees', val: '800+', icon: 'fa-graduation-cap' },
-              { label: 'Partner Organizations', val: '45+', icon: 'fa-handshake' },
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <div key={i}>
                 <div className="text-emerald-500 text-3xl mb-4"><i className={`fas ${stat.icon}`}></i></div>
                 <div className="text-4xl font-black mb-2">{stat.val}</div>

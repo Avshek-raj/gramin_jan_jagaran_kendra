@@ -5,15 +5,17 @@ import { ViewState } from '../types';
 interface NavbarProps {
   currentView: ViewState;
   setView: (view: ViewState) => void;
+  isAdminLoggedIn?: boolean;
+  onAdminLogout?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentView, setView, isAdminLoggedIn, onAdminLogout }) => {
   const navItems: { label: string; value: ViewState; icon: string }[] = [
     { label: 'Home', value: 'home', icon: 'fa-home' },
     { label: 'Our Work', value: 'programs', icon: 'fa-layer-group' },
     { label: 'Team', value: 'members', icon: 'fa-users' },
     { label: 'Contact', value: 'contact', icon: 'fa-envelope' },
-    { label: 'Admin', value: 'admin', icon: 'fa-user-lock' },
+    ...(isAdminLoggedIn ? [{ label: 'Admin', value: 'admin' as ViewState, icon: 'fa-user-lock' }] : []),
   ];
 
   return (
@@ -24,8 +26,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
             className="flex items-center cursor-pointer group" 
             onClick={() => setView('home')}
           >
-            <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white mr-3 group-hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20">
-              <i className="fas fa-hands-holding text-lg"></i>
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-emerald-600 mr-3 group-hover:bg-emerald-50 transition-colors shadow-lg shadow-emerald-600/20 overflow-hidden">
+              <img src="/assets/logo.jpeg" alt="Ganesha Logo" className="w-8 h-8" />
             </div>
             <div className="flex flex-col leading-tight">
               <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600">
@@ -52,13 +54,24 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
             ))}
           </div>
 
-          <button
-            onClick={() => setView('donate')}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg flex items-center space-x-2"
-          >
-            <i className="fas fa-heart text-xs"></i>
-            <span>Support Now</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setView('donate')}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg flex items-center space-x-2"
+            >
+              <i className="fas fa-heart text-xs"></i>
+              <span>Support Now</span>
+            </button>
+            {isAdminLoggedIn && (
+              <button
+                onClick={onAdminLogout}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
+              >
+                <i className="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </nav>

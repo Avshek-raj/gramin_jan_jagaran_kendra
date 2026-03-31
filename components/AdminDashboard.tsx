@@ -1,27 +1,28 @@
 
 import React, { useState } from 'react';
-import { Program, Member, Donation } from '../types';
-import { generateProgramDescription, generateImpactReport } from '../services/geminiService';
+import { Program, Member, Donation, Stat } from '../types';
 
 interface AdminDashboardProps {
   programs: Program[];
   members: Member[];
   donations: Donation[];
+  stats: Stat[];
   onAddProgram: (program: Program) => void;
   onUpdateProgram: (program: Program) => void;
   onAddMember: (member: Member) => void;
+  onUpdateStats: (stats: Stat[]) => void;
   onDeleteProgram: (id: string) => void;
   onDeleteMember: (id: string) => void;
+  onLogout: () => void;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
-  programs, members, donations, onAddProgram, onUpdateProgram, onAddMember, onDeleteProgram, onDeleteMember 
+  programs, members, donations, stats, onAddProgram, onUpdateProgram, onAddMember, onUpdateStats, onDeleteProgram, onDeleteMember, onLogout 
 }) => {
-  const [activeTab, setActiveTab] = useState<'programs' | 'members' | 'donations' | 'success-stories'>('programs');
+  const [activeTab, setActiveTab] = useState<'programs' | 'members' | 'donations' | 'success-stories' | 'stats'>('programs');
   const [isAddingProgram, setIsAddingProgram] = useState(false);
   const [editingProg, setEditingProg] = useState<Program | null>(null);
   const [isAddingMember, setIsAddingMember] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
 
   // Program Form State
   const [progTitle, setProgTitle] = useState('');
@@ -32,20 +33,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [progCollabs, setProgCollabs] = useState('');
   const [progGallery, setProgGallery] = useState('');
 
-  const handleGenDescription = async () => {
-    if (!progTitle) return alert("Enter a title first!");
-    setAiGenerating(true);
-    const desc = await generateProgramDescription(progTitle, progCat);
-    setProgDesc(desc);
-    setAiGenerating(false);
-  };
+  const [memName, setMemName] = useState('');
+  const [memRole, setMemRole] = useState('');
+  const [memBio, setMemBio] = useState('');
 
-  const handleGenImpact = async (prog: Program) => {
-    setAiGenerating(true);
-    const report = await generateImpactReport(prog);
-    onUpdateProgram({ ...prog, impactStatement: report });
-    setAiGenerating(false);
-  };
+  // Stats Edit State
+  const [isEditingStats, setIsEditingStats] = useState(false);
+  const [editedStats, setEditedStats] = useState<Stat[]>(stats);
+
+  const completedPrograms = programs.filter(p => p.status === 'completed');
+  const activePrograms = programs.filter(p => p.status === 'active');
 
   const openEditModal = (prog: Program) => {
     setEditingProg(prog);
@@ -130,13 +127,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setMemBio('');
   };
 
-  const [memName, setMemName] = useState('');
-  const [memRole, setMemRole] = useState('');
-  const [memBio, setMemBio] = useState('');
-
-  const completedPrograms = programs.filter(p => p.status === 'completed');
-  const activePrograms = programs.filter(p => p.status === 'active');
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
@@ -145,12 +135,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <p className="text-slate-500 mt-1">Operational hub for Gramin Jan Jagaran Kendra.</p>
         </div>
         
-        <div className="mt-6 md:mt-0 flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto">
-          {[
+        <button
+          onClick={onLogout}
+          className="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-bold text-sm flex items-center space-x-2 shadow-lg shadow-red-600/20"
+        >
+          <i className="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+      
+      <div className="mb-8 flex p-1.5 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto">
+            {[
             { id: 'programs', label: 'Initiatives', icon: 'fa-layer-group' },
             { id: 'success-stories', label: 'Our Success Stories', icon: 'fa-award' },
             { id: 'members', label: 'Team', icon: 'fa-users' },
-            { id: 'donations', label: 'Donations', icon: 'fa-receipt' }
+            { id: 'donations', label: 'Donations', icon: 'fa-receipt' },
+            { id: 'stats', label: 'Site Stats', icon: 'fa-chart-bar' }
           ].map(tab => (
             <button
               key={tab.id}
@@ -164,7 +164,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
           ))}
         </div>
-      </div>
 
       {activeTab === 'programs' && (
         <div className="animate-fade-in">
@@ -259,22 +258,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="bg-emerald-800/30 p-6 rounded-2xl border border-emerald-700/50 mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center">
-                        <i className="fas fa-scroll mr-2"></i> Success Summary
-                      </h4>
-                      {!prog.impactStatement && (
-                        <button 
-                          onClick={() => handleGenImpact(prog)}
-                          className="text-[9px] font-bold text-emerald-300 hover:text-white underline transition-all"
-                          disabled={aiGenerating}
-                        >
-                          {aiGenerating ? 'Summarizing...' : 'Generate AI Report'}
-                        </button>
-                      )}
-                    </div>
+                    <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center mb-2">
+                      <i className="fas fa-scroll mr-2"></i> Success Summary
+                    </h4>
                     <p className="text-emerald-50 text-sm italic leading-relaxed">
-                      {prog.impactStatement || "No success story documented yet. Please generate or write an impact statement to showcase this achievement."}
+                      {prog.impactStatement || "No success story documented yet. Please write an impact statement to showcase this achievement."}
                     </p>
                   </div>
 
@@ -415,6 +403,91 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
+      {activeTab === 'stats' && (
+        <div className="animate-fade-in bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-black text-slate-900">Site Statistics</h2>
+            <button 
+              onClick={() => {
+                setEditedStats(stats);
+                setIsEditingStats(!isEditingStats);
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm flex items-center space-x-2 shadow-lg shadow-emerald-600/20"
+            >
+              <i className={`fas ${isEditingStats ? 'fa-times' : 'fa-edit'}`}></i>
+              <span>{isEditingStats ? 'Cancel' : 'Edit Stats'}</span>
+            </button>
+          </div>
+
+          {!isEditingStats ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {stats.map((stat, i) => (
+                <div key={i} className="text-center p-6 bg-slate-50 rounded-2xl">
+                  <div className="text-emerald-500 text-2xl mb-3"><i className={`fas ${stat.icon}`}></i></div>
+                  <div className="text-3xl font-black mb-2">{stat.val}</div>
+                  <div className="text-slate-400 font-bold text-xs uppercase tracking-widest">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {editedStats.map((stat, i) => (
+                <div key={i} className="p-6 bg-slate-50 rounded-2xl space-y-4 border border-slate-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Label</label>
+                      <input 
+                        value={stat.label}
+                        onChange={(e) => {
+                          const newStats = [...editedStats];
+                          newStats[i].label = e.target.value;
+                          setEditedStats(newStats);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-emerald-500 focus:bg-white bg-white outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Value</label>
+                      <input 
+                        value={stat.val}
+                        onChange={(e) => {
+                          const newStats = [...editedStats];
+                          newStats[i].val = e.target.value;
+                          setEditedStats(newStats);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-emerald-500 focus:bg-white bg-white outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Icon</label>
+                      <input 
+                        value={stat.icon}
+                        onChange={(e) => {
+                          const newStats = [...editedStats];
+                          newStats[i].icon = e.target.value;
+                          setEditedStats(newStats);
+                        }}
+                        placeholder="e.g. fa-users"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-emerald-500 focus:bg-white bg-white outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button 
+                onClick={() => {
+                  onUpdateStats(editedStats);
+                  setIsEditingStats(false);
+                }}
+                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-emerald-600/20 transition-all"
+              >
+                Save Statistics
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {isAddingProgram && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto">
           <div className="bg-white rounded-[2rem] w-full max-w-2xl p-10 shadow-2xl animate-scale-up border border-slate-100 my-8">
@@ -443,17 +516,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-400">Mission Description</label>
-                  <button 
-                    type="button" 
-                    onClick={handleGenDescription} 
-                    className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 flex items-center bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 transition-all"
-                    disabled={aiGenerating}
-                  >
-                    {aiGenerating ? 'Processing...' : <><i className="fas fa-magic mr-1.5"></i> AI Assist</>}
-                  </button>
-                </div>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Mission Description</label>
                 <textarea required value={progDesc} onChange={e => setProgDesc(e.target.value)} className="w-full h-24 px-5 py-4 rounded-2xl border-2 border-slate-50 focus:border-emerald-500 focus:bg-white bg-slate-50 outline-none transition-all resize-none leading-relaxed"></textarea>
               </div>
 

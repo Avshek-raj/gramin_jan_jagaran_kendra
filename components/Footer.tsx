@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center text-white mb-6">
-              <i className="fas fa-hands-holding text-2xl text-emerald-500 mr-3"></i>
+              <img src="/assets/logo.jpeg" alt="Ganesha Logo" className="w-8 h-8 text-emerald-500 mr-3" />
               <span className="text-2xl font-black tracking-tight">Gramin Jan Jagaran Kendra</span>
             </div>
             <p className="max-w-md text-slate-500 mb-6 leading-relaxed">

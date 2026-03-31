@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Program, Donation } from '../types';
-import { generateThankYouNote } from '../services/geminiService';
 
 interface DonationFlowProps {
   programs: Program[];
@@ -14,21 +13,14 @@ const DonationFlow: React.FC<DonationFlowProps> = ({ programs, onComplete }) => 
   const [amount, setAmount] = useState<number>(50);
   const [selectedProgramId, setSelectedProgramId] = useState(programs[0]?.id || '');
   const [loading, setLoading] = useState(false);
-  const [thankYouNote, setThankYouNote] = useState('');
 
   const handleNext = () => setStep(prev => (prev + 1) as any);
   const handleBack = () => setStep(prev => (prev - 1) as any);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    const program = programs.find(p => p.id === selectedProgramId);
-    
-    // Generate AI Thank You
-    const note = await generateThankYouNote(donorName || 'Anonymous Friend', amount, program?.title || 'our programs');
-    setThankYouNote(note);
-
     const donation: Donation = {
       id: Math.random().toString(36).substr(2, 9),
       donorName: donorName || 'Anonymous',
@@ -168,9 +160,8 @@ const DonationFlow: React.FC<DonationFlowProps> = ({ programs, onComplete }) => 
               <h2 className="text-3xl font-bold text-slate-900 mb-2">Thank You!</h2>
               <p className="text-slate-500 mb-8">Your contribution of <span className="font-bold text-emerald-600">${amount}</span> has been processed successfully.</p>
               
-              <div className="bg-slate-50 p-6 rounded-2xl text-left border border-slate-200 mb-8 italic text-slate-700 relative">
-                <i className="fas fa-quote-left absolute -top-3 -left-1 text-slate-200 text-4xl -z-10"></i>
-                {thankYouNote}
+              <div className="bg-slate-50 p-6 rounded-2xl text-left border border-slate-200 mb-8 text-slate-700">
+                <p>Thank you for supporting our mission! Your generosity will make a real difference in our community. Every contribution, no matter the size, helps us serve better and reach more people.</p>
               </div>
 
               <button 

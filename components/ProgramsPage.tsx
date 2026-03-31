@@ -1,14 +1,15 @@
 
 import React, { useState } from 'react';
-import { Program } from '../types';
+import { Program, Comment } from '../types';
 import ProgramCard from './ProgramCard';
 
 interface ProgramsPageProps {
   programs: Program[];
   onDonate: (program: Program) => void;
+  onAddComment?: (programId: string, comment: Comment) => void;
 }
 
-const ProgramsPage: React.FC<ProgramsPageProps> = ({ programs, onDonate }) => {
+const ProgramsPage: React.FC<ProgramsPageProps> = ({ programs, onDonate, onAddComment }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
   const [filter, setFilter] = useState<string>('All');
   
@@ -82,7 +83,8 @@ const ProgramsPage: React.FC<ProgramsPageProps> = ({ programs, onDonate }) => {
           <ProgramCard 
             key={program.id} 
             program={program} 
-            onClick={() => program.status === 'active' ? onDonate(program) : alert(`Impact Report for ${program.title}: ${program.impactStatement}`)} 
+            onClick={() => program.status === 'active' ? onDonate(program) : alert(`Impact Report for ${program.title}: ${program.impactStatement}`)}
+            onAddComment={onAddComment}
           />
         ))}
         {filtered.length === 0 && (

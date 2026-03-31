@@ -11,6 +11,14 @@ export interface Program {
   currentAmount: number;
   impactStatement?: string;
   status: 'active' | 'completed';
+  comments?: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  author: string;
+  text: string;
+  date: string;
 }
 
 export interface Member {
@@ -29,6 +37,12 @@ export interface Donation {
   programId: string;
   message?: string;
   date: string;
+}
+
+export interface Stat {
+  label: string;
+  val: string;
+  icon: string;
 }
 
 export type ViewState = 'home' | 'programs' | 'members' | 'donate' | 'admin' | 'contact';
